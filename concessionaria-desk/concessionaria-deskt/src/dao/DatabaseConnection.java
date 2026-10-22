@@ -2,6 +2,8 @@ package dao;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -11,9 +13,8 @@ import java.util.Properties;
 /**
  * Gerencia a conexão com o banco de dados.
  *
- * SEGURANÇA: As credenciais são lidas de resources/config.properties,
- * que NÃO deve ser versionado no Git (já está no .gitignore).
- * Copie config.properties.example → config.properties e preencha os valores.
+ * SEGURANÇA: prioriza config.properties ao lado do JAR ou em resources/.
+ * O arquivo com credenciais não deve ser empacotado nem versionado.
  *
  * PERFORMANCE: initSchema() é executado apenas uma vez na inicialização
  * da aplicação (via DatabaseConnection.initialize()), não a cada conexão.
@@ -33,15 +34,13 @@ public class DatabaseConnection {
                 "Driver PostgreSQL não encontrado no classpath. Verifique o Build Path.", e);
         }
 
-        try (InputStream input = DatabaseConnection.class
-                .getClassLoader()
-                .getResourceAsStream("config.properties")) {
+        try (InputStream input = abrirConfiguracao()) {
 
             if (input == null) {
                 throw new RuntimeException(
-                    "Arquivo config.properties não encontrado em resources/.\n" +
-                    "Copie resources/config.properties.example → resources/config.properties " +
-                    "e preencha com suas credenciais.");
+                    "Arquivo config.properties não encontrado.\n" +
+                    "Copie config.properties.example para config.properties ao lado do JAR " +
+                    "e preencha suas credenciais.");
             }
 
             Properties props = new Properties();
@@ -54,6 +53,19 @@ public class DatabaseConnection {
         } catch (IOException e) {
             throw new RuntimeException("Erro ao ler config.properties", e);
         }
+    }
+
+    private static InputStream abrirConfiguracao() throws IOException {
+        Path[] caminhos = {
+            Path.of("config.properties"),
+            Path.of("resources", "config.properties")
+        };
+        for (Path caminho : caminhos) {
+            if (Files.isRegularFile(caminho)) {
+                return Files.newInputStream(caminho);
+            }
+        }
+        return DatabaseConnection.class.getClassLoader().getResourceAsStream("config.properties");
     }
 
     /**

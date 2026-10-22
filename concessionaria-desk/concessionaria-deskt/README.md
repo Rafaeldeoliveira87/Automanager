@@ -37,6 +37,22 @@
 
 ## Configuração do Projeto
 
+### Gerar o JAR executável
+
+No terminal, dentro desta pasta, execute:
+
+```bash
+mvn clean package
+```
+
+O Maven gera `target/concessionaria-desktop.jar` com as dependências incluídas. Para distribuir, copie esse JAR e `resources/config.properties.example` para uma pasta no computador de destino, crie nessa pasta um `config.properties` preenchido com as credenciais daquele ambiente e execute:
+
+```bash
+java -jar concessionaria-desktop.jar
+```
+
+O computador precisa ter Java 17+ e acesso de rede ao PostgreSQL. O arquivo `config.properties` é externo e não é incluído no JAR.
+
 ### 1. Dependências (PostgreSQL + jBCrypt)
 
 Este projeto já possui `pom.xml` com as dependências:
