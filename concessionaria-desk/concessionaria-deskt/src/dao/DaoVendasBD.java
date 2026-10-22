@@ -15,7 +15,7 @@ public class DaoVendasBD implements DaoVenda {
     @Override
     public void registrarVenda(Vendas venda) throws SQLException {
         String sqlVenda  = "INSERT INTO vendas (id_carro, id_funcionario, valor_venda, comissao, data_venda) VALUES (?,?,?,?,?)";
-        String sqlStatus = "UPDATE carros SET status = 'Vendido' WHERE id = ?";
+        String sqlStatus = "UPDATE carros SET status = 'Vendido' WHERE id = ? AND status = 'Disponível'";
 
         Connection conn = null;
         try {
@@ -31,9 +31,14 @@ public class DaoVendasBD implements DaoVenda {
                 pVenda.executeUpdate();
             }
 
+            int carrosAtualizados;
             try (PreparedStatement pStatus = conn.prepareStatement(sqlStatus)) {
                 pStatus.setInt(1, venda.getIdCarro());
-                pStatus.executeUpdate();
+                carrosAtualizados = pStatus.executeUpdate();
+            }
+
+            if (carrosAtualizados == 0) {
+                throw new SQLException("Carro não está mais disponível para venda.");
             }
 
             conn.commit(); // confirma transação

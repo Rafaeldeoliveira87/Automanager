@@ -63,7 +63,7 @@ db.user=SEU_USUARIO
 db.password=SUA_SENHA
 ```
 
-> ⚠️ O arquivo `config.properties` já está no `.gitignore` — **nunca commite ele**.
+> ⚠️ O arquivo `config.properties` está no `.gitignore` da raiz — **nunca commite ele**.
 
 ### 3. Ponto de Entrada
 

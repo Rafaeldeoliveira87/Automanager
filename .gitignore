@@ -1,0 +1,13 @@
+# Credenciais locais do banco
+concessionaria-api/src/main/resources/config.properties
+concessionaria-desk/concessionaria-deskt/resources/config.properties
+
+# Segredos e arquivos de ambiente
+.env
+.env.*
+!.env.example
+
+# Saídas de build
+**/target/
+**/node_modules/
+*.class

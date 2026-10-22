@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 /**
@@ -14,10 +15,8 @@ import java.util.Date;
  * informações (aqui: username, papel e funcionarioId) e a "signature"
  * garante que ninguém alterou esse conteúdo sem saber o segredo (JWT_SECRET).
  *
- * O segredo vem da variável de ambiente JWT_SECRET. Em produção (Render),
- * configure isso no painel. Em desenvolvimento local, se a variável não
- * existir, geramos uma só para a sessão atual (o token para de funcionar
- * a cada restart -- é aceitável em dev, NUNCA em produção).
+ * O segredo vem da variável de ambiente JWT_SECRET e deve ter pelo menos
+ * 32 bytes. A aplicação não inicia sem essa configuração.
  */
 public class JwtUtil {
 
@@ -25,16 +24,17 @@ public class JwtUtil {
 
     private static final SecretKey CHAVE = carregarChave();
 
+    /** Força a validação do segredo durante a inicialização da aplicação. */
+    public static void validarConfiguracao() {
+        // A inicialização da classe valida JWT_SECRET.
+    }
+
     private static SecretKey carregarChave() {
         String secretEnv = System.getenv("JWT_SECRET");
-        if (secretEnv != null && secretEnv.length() >= 32) {
-            return Keys.hmacShaKeyFor(secretEnv.getBytes());
+        if (secretEnv == null || secretEnv.getBytes(StandardCharsets.UTF_8).length < 32) {
+            throw new IllegalStateException("JWT_SECRET é obrigatório e deve conter pelo menos 32 bytes.");
         }
-        System.err.println("[AVISO] JWT_SECRET não definido (ou curto demais). " +
-            "Gerando uma chave temporária só para esta execução -- " +
-            "configure a variável de ambiente antes de ir para produção.");
-        return Keys.hmacShaKeyFor(java.util.Base64.getEncoder()
-            .encode(java.util.UUID.randomUUID().toString().repeat(2).getBytes()));
+        return Keys.hmacShaKeyFor(secretEnv.getBytes(StandardCharsets.UTF_8));
     }
 
     public static String gerarToken(String username, String papel, Integer funcionarioId) {
