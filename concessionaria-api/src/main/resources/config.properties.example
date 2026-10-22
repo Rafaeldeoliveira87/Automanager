@@ -1,0 +1,6 @@
+# Copie este arquivo para "config.properties" (mesma pasta) e preencha com
+# as MESMAS credenciais que voce ja usa no projeto desktop (banco Neon).
+# Este arquivo NAO deve ser commitado no Git -- so o .example fica versionado.
+db.url=jdbc:postgresql://SEU-HOST.neon.tech/Concessionaria?sslmode=require
+db.user=
+db.password=SUA_SENHA

@@ -1,0 +1,7 @@
+out/
+target/
+.idea/
+*.iml
+
+# Credenciais locais
+resources/config.properties
